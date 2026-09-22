@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#1c3d32" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Household" />
+  <title>Household Budget</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f4efe6;
+      --paper: #fffaf3;
+      --ink: #1c241f;
+      --muted: #5f6b64;
+      --line: #e4d9c8;
+      --green: #1c3d32;
+      --green-2: #2a5a48;
+      --mint: #dceee4;
+      --gold: #c9893a;
+      --rose: #8b3a3a;
+      --ok: #2f6b4f;
+      --shadow: 0 10px 30px rgba(28, 61, 50, 0.08);
+      --radius: 22px;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: Outfit, system-ui, sans-serif;
+      background:
+        radial-gradient(1200px 500px at 10% -10%, #efe4d0 0%, transparent 55%),
+        var(--bg);
+      color: var(--ink);
+      min-height: 100dvh;
+      padding: 18px 16px 110px;
+    }
+    h1, h2, .display { font-family: Fraunces, Georgia, serif; }
+    .wrap { max-width: 560px; margin: 0 auto; }
+    header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 8px 4px 18px;
+    }
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    h1 { font-size: 28px; margin: 4px 0 0; font-weight: 650; }
+    .icon-btn, button, input, select {
+      font-family: inherit;
+    }
+    .icon-btn {
+      border: 0;
+      background: var(--paper);
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      font-size: 18px;
+    }
+    .hero {
+      background: linear-gradient(160deg, var(--green) 0%, #16332a 100%);
+      color: #f7f1e6;
+      border-radius: 28px;
+      padding: 24px 22px 20px;
+      box-shadow: var(--shadow);
+    }
+    .hero .label { opacity: 0.75; font-size: 13px; font-weight: 500; }
+    .hero .amount {
+      font-family: Fraunces, Georgia, serif;
+      font-size: 46px;
+      line-height: 1.05;
+      margin: 6px 0 14px;
+      font-weight: 650;
+      letter-spacing: -0.03em;
+    }
+    .hero.over .amount { color: #ffd0c8; }
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+    }
+    .stat {
+      background: rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 10px;
+    }
+    .stat span { display: block; font-size: 11px; opacity: 0.7; }
+    .stat b { font-size: 14px; font-weight: 600; }
+    .bar {
+      height: 8px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 99px;
+      overflow: hidden;
+      margin: 16px 0 6px;
+    }
+    .bar > i {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #e8c17a, #f3e1b8);
+      border-radius: 99px;
+      transition: width .4s ease;
+    }
+    .hero.over .bar > i { background: #e8a090; }
+    .note { font-size: 12px; opacity: 0.75; }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 16px 0;
+    }
+    .card {
+      background: var(--paper);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+    .card h2 {
+      font-size: 18px;
+      margin: 0 0 12px;
+    }
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .row:last-child { border-bottom: 0; padding-bottom: 0; }
+    .row:first-of-type { padding-top: 0; }
+    .who { font-weight: 600; }
+    .muted { color: var(--muted); font-size: 13px; }
+    .bill-name { font-weight: 600; }
+    .cat { font-size: 12px; color: var(--muted); }
+    .amt { font-weight: 700; white-space: nowrap; }
+    .amt.paid { color: var(--muted); text-decoration: line-through; }
+    .actions { display: flex; gap: 6px; }
+    .tiny {
+      border: 0;
+      background: #efe8db;
+      border-radius: 10px;
+      padding: 8px 10px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .tiny.danger { background: #f3e0dc; color: var(--rose); }
+    .add {
+      width: 100%;
+      border: 1.5px dashed #cbbfaa;
+      background: transparent;
+      border-radius: 16px;
+      padding: 14px;
+      margin-top: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--green);
+    }
+    .fab-row {
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      padding: 12px 16px calc(14px + env(safe-area-inset-bottom));
+      background: linear-gradient(180deg, transparent, var(--bg) 30%);
+      display: flex;
+      justify-content: center;
+      pointer-events: none;
+    }
+    .fab-row > div {
+      pointer-events: auto;
+      width: 100%;
+      max-width: 560px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+    }
+    .nav-btn {
+      border: 0;
+      background: var(--paper);
+      border-radius: 16px;
+      padding: 12px 8px;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .nav-btn.active { background: var(--green); color: #fffaf3; }
+    dialog {
+      border: 0;
+      border-radius: 24px;
+      padding: 0;
+      width: min(92vw, 420px);
+      background: var(--paper);
+      box-shadow: 0 30px 80px rgba(0,0,0,.25);
+    }
+    dialog::backdrop { background: rgba(20, 28, 24, .45); }
+    .sheet { padding: 20px; }
+    label { display: block; font-size: 13px; font-weight: 600; margin: 12px 0 6px; }
+    input, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 14px;
+      padding: 13px 14px;
+      font-size: 16px;
+    }
+    .btn {
+      width: 100%;
+      border: 0;
+      background: var(--green);
+      color: #fff;
+      border-radius: 14px;
+      padding: 14px;
+      font-weight: 700;
+      font-size: 16px;
+      margin-top: 16px;
+      cursor: pointer;
+    }
+    .btn.ghost {
+      background: #efe8db;
+      color: var(--ink);
+      margin-top: 8px;
+    }
+    .hidden { display: none !important; }
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 18px 8px;
+      font-size: 14px;
+    }
+    .share-box {
+      background: #f7f1e6;
+      border-radius: 16px;
+      padding: 14px;
+      white-space: pre-wrap;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 92px;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--ink);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 999px;
+      opacity: 0;
+      transition: .25s ease;
+      pointer-events: none;
+      font-size: 13px;
+      z-index: 20;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .check {
+      width: 22px; height: 22px; border-radius: 7px;
+      border: 2px solid #c9bead; display: grid; place-items: center;
+      flex-shrink: 0; cursor: pointer; background: #fff;
+    }
+    .check.on { background: var(--green); border-color: var(--green); color: #fff; }
+    .left { display: flex; gap: 10px; align-items: center; min-width: 0; }
+    .left .text { min-width: 0; }
+    .left .text div { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .hint { font-size: 13px; color: var(--muted); line-height: 1.45; }
+    .section { margin-top: 16px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <div class="eyebrow" id="monthLabel">This month</div>
+        <h1 id="homeTitle">Household</h1>
+      </div>
+      <button class="icon-btn" id="settingsBtn" aria-label="Settings">⚙</button>
+    </header>
+
+    <section class="hero" id="hero">
+      <div class="label" id="leftLabel">Left after bills</div>
+      <div class="amount" id="leftAmount">£0.00</div>
+      <div class="stats">
+        <div class="stat"><span>Income</span><b id="incomeTotal">£0</b></div>
+        <div class="stat"><span>Bills</span><b id="billsTotal">£0</b></div>
+        <div class="stat"><span>Paid</span><b id="paidTotal">£0</b></div>
+      </div>
+      <div class="bar"><i id="barFill"></i></div>
+      <div class="note" id="barNote">Add your pay and bills to get started.</div>
+    </section>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="eyebrow">Daily leftover</div>
+        <div class="display" style="font-size:26px;margin-top:6px" id="dailyLeft">£0</div>
+        <div class="muted">if bills are covered</div>
+      </div>
+      <div class="card">
+        <div class="eyebrow">Still to pay</div>
+        <div class="display" style="font-size:26px;margin-top:6px" id="stillToPay">£0</div>
+        <div class="muted">unpaid bills</div>
+      </div>
+    </div>
+
+    <section class="card section" id="incomeCard">
+      <h2>Pay coming in</h2>
+      <div id="incomeList"></div>
+      <button class="add" id="addIncomeBtn">+ Add income</button>
+    </section>
+
+    <section class="card section" id="billsCard">
+      <h2>Monthly bills</h2>
+      <div id="billsList"></div>
+      <button class="add" id="addBillBtn">+ Add a bill</button>
+    </section>
+  </div>
+
+  <div class="fab-row">
+    <div>
+      <button class="nav-btn active" data-panel="home">Home</button>
+      <button class="nav-btn" data-panel="share">Share</button>
+      <button class="nav-btn" id="quickAdd">+ Bill</button>
+    </div>
+  </div>
+
+  <dialog id="itemDialog">
+    <form class="sheet" method="dialog" id="itemForm">
+      <h2 class="display" id="dialogTitle" style="margin:0 0 8px;font-size:24px">Add bill</h2>
+      <input type="hidden" id="editId" />
+      <input type="hidden" id="editKind" />
+      <label>Name</label>
+      <input id="itemName" required placeholder="Rent, Tesco, Salary..." />
+      <label>Amount</label>
+      <input id="itemAmount" required inputmode="decimal" placeholder="0.00" />
+      <div id="billExtras">
+        <label>Category</label>
+        <select id="itemCat">
+          <option>Home</option>
+          <option>Utilities</option>
+          <option>Food</option>
+          <option>Transport</option>
+          <option>Insurance</option>
+          <option>Phone & internet</option>
+          <option>Subscriptions</option>
+          <option>Kids</option>
+          <option>Other</option>
+        </select>
+        <label>Due day (optional)</label>
+        <input id="itemDue" inputmode="numeric" placeholder="e.g. 1 or 28" />
+      </div>
+      <button class="btn" value="save" id="saveBtn">Save</button>
+      <button class="btn ghost" value="cancel">Cancel</button>
+    </form>
+  </dialog>
+
+  <dialog id="settingsDialog">
+    <form class="sheet" method="dialog">
+      <h2 class="display" style="margin:0 0 8px;font-size:24px">Settings</h2>
+      <label>Household name</label>
+      <input id="houseName" maxlength="32" />
+      <label>Currency</label>
+      <select id="currency">
+        <option value="£">£ British pound</option>
+        <option value="$">$ US dollar</option>
+        <option value="€">€ Euro</option>
+        <option value="R">R South African rand</option>
+        <option value="₦">₦ Naira</option>
+      </select>
+      <p class="hint">Everything is saved on this phone. Use Share to send a copy to your partner.</p>
+      <button class="btn" value="save" id="saveSettings">Save</button>
+      <button class="btn ghost" value="cancel">Close</button>
+    </form>
+  </dialog>
+
+  <dialog id="shareDialog">
+    <div class="sheet">
+      <h2 class="display" style="margin:0 0 8px;font-size:24px">Share with your partner</h2>
+      <p class="hint">This app stores numbers on each phone. Send a snapshot so they can open the same budget, or send a plain summary.</p>
+      <div class="share-box" id="summaryBox"></div>
+      <button class="btn" id="shareTextBtn">Send summary</button>
+      <button class="btn ghost" id="copySummaryBtn">Copy summary</button>
+      <button class="btn ghost" id="exportBtn">Download backup file</button>
+      <button class="btn ghost" id="importBtn">Load backup file</button>
+      <input type="file" id="importFile" accept="application/json,.json" class="hidden" />
+      <button class="btn ghost" id="closeShare">Close</button>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const KEY = "household-budget-v1";
+    const $ = (id) => document.getElementById(id);
+
+    const state = load() || {
+      name: "Household",
+      currency: "£",
+      incomes: [],
+      bills: []
+    };
+
+    const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    $("monthLabel").textContent = months[new Date().getMonth()] + " " + new Date().getFullYear();
+
+    function load() {
+      try { return JSON.parse(localStorage.getItem(KEY)); } catch { return null; }
+    }
+    function save() {
+      localStorage.setItem(KEY, JSON.stringify(state));
+      render();
+    }
+    function money(n) {
+      const num = Number(n) || 0;
+      const abs = Math.abs(num).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      return (num < 0 ? "-" : "") + state.currency + abs;
+    }
+    function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+    function toast(msg) {
+      const t = $("toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), 1800);
+    }
+
+    function totals() {
+      const income = state.incomes.reduce((s, i) => s + Number(i.amount || 0), 0);
+      const bills = state.bills.reduce((s, b) => s + Number(b.amount || 0), 0);
+      const paid = state.bills.filter(b => b.paid).reduce((s, b) => s + Number(b.amount || 0), 0);
+      const left = income - bills;
+      const unpaid = bills - paid;
+      const daysLeft = Math.max(1, new Date(new Date().getFullYear(), new Date().getMonth()+1, 0).getDate() - new Date().getDate() + 1);
+      return { income, bills, paid, left, unpaid, daysLeft, daily: left / daysLeft };
+    }
+
+    function render() {
+      $("homeTitle").textContent = state.name || "Household";
+      const t = totals();
+      const hero = $("hero");
+      hero.classList.toggle("over", t.left < 0);
+      $("leftLabel").textContent = t.left < 0 ? "Short this month" : "Left after bills";
+      $("leftAmount").textContent = money(t.left);
+      $("incomeTotal").textContent = money(t.income);
+      $("billsTotal").textContent = money(t.bills);
+      $("paidTotal").textContent = money(t.paid);
+      $("dailyLeft").textContent = money(Math.max(0, t.daily));
+      $("stillToPay").textContent = money(t.unpaid);
+      const pct = t.income <= 0 ? 0 : Math.min(100, (t.bills / t.income) * 100);
+      $("barFill").style.width = pct + "%";
+      $("barNote").textContent = t.income === 0 && t.bills === 0
+        ? "Add your pay and bills to get started."
+        : t.left < 0
+          ? "Bills are higher than pay. Trim a few items or add missing income."
+          : Math.round(pct) + "% of pay is taken by bills. " + money(t.daily) + " a day left this month.";
+
+      const incomeList = $("incomeList");
+      if (!state.incomes.length) {
+        incomeList.innerHTML = `<div class="empty">Add wages, benefits, or side pay.</div>`;
+      } else {
+        incomeList.innerHTML = state.incomes.map(i => `
+          <div class="row">
+            <div>
+              <div class="who">${escapeHtml(i.name)}</div>
+              <div class="muted">each month</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="amt">${money(i.amount)}</div>
+              <div class="actions">
+                <button class="tiny" onclick="editItem('income','${i.id}')">Edit</button>
+                <button class="tiny danger" onclick="removeItem('income','${i.id}')">Remove</button>
+              </div>
+            </div>
+          </div>
+        `).join("");
+      }
+
+      const billsList = $("billsList");
+      if (!state.bills.length) {
+        billsList.innerHTML = `<div class="empty">Rent, electric, wifi, food shop — add each one.</div>`;
+      } else {
+        billsList.innerHTML = state.bills.map(b => `
+          <div class="row">
+            <div class="left">
+              <div class="check ${b.paid ? "on" : ""}" onclick="togglePaid('${b.id}')">${b.paid ? "✓" : ""}</div>
+              <div class="text">
+                <div class="bill-name">${escapeHtml(b.name)}</div>
+                <div class="cat">${escapeHtml(b.category || "Other")}${b.due ? " · due " + b.due : ""}</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="amt ${b.paid ? "paid" : ""}">${money(b.amount)}</div>
+              <div class="actions">
+                <button class="tiny" onclick="editItem('bill','${b.id}')">Edit</button>
+                <button class="tiny danger" onclick="removeItem('bill','${b.id}')">Remove</button>
+              </div>
+            </div>
+          </div>
+        `).join("");
+      }
+
+      $("summaryBox").textContent = summaryText();
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({'&':'&','<':'<','>':'>','"':'"',"'":'&#39;'}[c]));
+    }
+
+    function summaryText() {
+      const t = totals();
+      const month = months[new Date().getMonth()];
+      const lines = [
+        (state.name || "Household") + " budget — " + month,
+        "Income: " + money(t.income),
+        "Bills: " + money(t.bills),
+        (t.left < 0 ? "Short: " : "Left: ") + money(t.left),
+        ""
+      ];
+      if (state.incomes.length) {
+        lines.push("Pay:");
+        state.incomes.forEach(i => lines.push("• " + i.name + " " + money(i.amount)));
+        lines.push("");
+      }
+      if (state.bills.length) {
+        lines.push("Bills:");
+        state.bills.forEach(b => lines.push((b.paid ? "✓ " : "• ") + b.name + " " + money(b.amount)));
+      }
+      return lines.join("\n");
+    }
+
+    function openItem(kind, item) {
+      $("editKind").value = kind;
+      $("editId").value = item ? item.id : "";
+      $("dialogTitle").textContent = item ? "Edit " + kind : "Add " + kind;
+      $("itemName").value = item ? item.name : "";
+      $("itemAmount").value = item ? item.amount : "";
+      $("itemCat").value = item && item.category ? item.category : "Home";
+      $("itemDue").value = item && item.due ? item.due : "";
+      $("billExtras").classList.toggle("hidden", kind !== "bill");
+      $("itemDialog").showModal();
+      setTimeout(() => $("itemName").focus(), 50);
+    }
+
+    window.editItem = function(kind, id) {
+      const list = kind === "bill" ? state.bills : state.incomes;
+      openItem(kind, list.find(x => x.id === id));
+    };
+    window.removeItem = function(kind, id) {
+      if (!confirm("Remove this?")) return;
+      if (kind === "bill") state.bills = state.bills.filter(x => x.id !== id);
+      else state.incomes = state.incomes.filter(x => x.id !== id);
+      save();
+    };
+    window.togglePaid = function(id) {
+      const b = state.bills.find(x => x.id === id);
+      if (!b) return;
+      b.paid = !b.paid;
+      save();
+    };
+
+    $("addIncomeBtn").onclick = () => openItem("income");
+    $("addBillBtn").onclick = () => openItem("bill");
+    $("quickAdd").onclick = () => openItem("bill");
+
+    $("saveBtn").addEventListener("click", (e) => {
+      e.preventDefault();
+      const name = $("itemName").value.trim();
+      const amount = Number(String($("itemAmount").value).replace(/,/g, ""));
+      if (!name || !amount || amount < 0) { toast("Add a name and amount"); return; }
+      const kind = $("editKind").value;
+      const id = $("editId").value;
+      if (kind === "bill") {
+        const data = { id: id || uid(), name, amount, category: $("itemCat").value, due: $("itemDue").value.trim(), paid: false };
+        const i = state.bills.findIndex(x => x.id === id);
+        if (i >= 0) { data.paid = state.bills[i].paid; state.bills[i] = data; }
+        else state.bills.push(data);
+      } else {
+        const data = { id: id || uid(), name, amount };
+        const i = state.incomes.findIndex(x => x.id === id);
+        if (i >= 0) state.incomes[i] = data;
+        else state.incomes.push(data);
+      }
+      $("itemDialog").close();
+      save();
+    });
+
+    $("settingsBtn").onclick = () => {
+      $("houseName").value = state.name || "";
+      $("currency").value = state.currency || "£";
+      $("settingsDialog").showModal();
+    };
+    $("saveSettings").onclick = (e) => {
+      e.preventDefault();
+      state.name = $("houseName").value.trim() || "Household";
+      state.currency = $("currency").value;
+      $("settingsDialog").close();
+      save();
+    };
+
+    document.querySelectorAll(".nav-btn[data-panel]").forEach(btn => {
+      btn.onclick = () => {
+        if (btn.dataset.panel === "share") $("shareDialog").showModal();
+      };
+    });
+    $("closeShare").onclick = () => $("shareDialog").close();
+
+    $("copySummaryBtn").onclick = async () => {
+      try { await navigator.clipboard.writeText(summaryText()); toast("Summary copied"); }
+      catch { toast("Copy failed"); }
+    };
+    $("shareTextBtn").onclick = async () => {
+      const text = summaryText();
+      if (navigator.share) {
+        try { await navigator.share({ title: state.name + " budget", text }); return; } catch {}
+      }
+      try { await navigator.clipboard.writeText(text); toast("Copied — paste in a message"); }
+      catch { toast("Copy the box above"); }
+    };
+    $("exportBtn").onclick = () => {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "household-budget.json";
+      a.click();
+      toast("Backup downloaded");
+    };
+    $("importBtn").onclick = () => $("importFile").click();
+    $("importFile").onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(reader.result);
+          if (!data || !Array.isArray(data.bills) || !Array.isArray(data.incomes)) throw new Error("bad");
+          state.name = data.name || state.name;
+          state.currency = data.currency || state.currency;
+          state.incomes = data.incomes;
+          state.bills = data.bills;
+          save();
+          $("shareDialog").close();
+          toast("Budget loaded");
+        } catch {
+          toast("That file could not be read");
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = "";
+    };
+
+    render();
+  </script>
+</body>
+</html>
